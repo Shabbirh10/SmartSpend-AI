@@ -1,94 +1,45 @@
-# **CreditCardStatementAnalyser**
+# 💳 Credit Card Statement Parser
 
-CreditCardStatementAnalyser is a Python project I built to automatically read, clean, and analyze credit card statements. Instead of going through transactions manually, this tool extracts useful insights such as spending categories, monthly totals, high-value transactions, and patterns in expenses.
+A Python tool to extract, clean, and summarise data from credit card statements (PDF/CSV). 
+It helps users view their bank details, total amount due, and payment due date in a clear format.
 
----
+🧩 Supported Banks
 
-## **About the Project**
+HDFC Bank
 
-I created this tool to make it easier to understand where money is going each month. Many banks export statements in messy formats (PDF/CSV), and manually going through transactions is time-consuming.
-This project parses the data, organizes it, and gives a clear breakdown of spending.
+ICICI Bank
 
----
+SBI Card
 
-## **What It Can Do**
+Axis Bank
+(and more to be added)
 
-* Read and process credit card statements
-* Clean and format transaction data
-* Categorize expenses (food, travel, shopping, utilities, etc.)
-* Calculate total monthly spending
-* Identify top categories and biggest transactions
-* Generate summaries for quick insights
-* Export cleaned data for further analysis
+👨‍💻 Author
 
-*(If yours also reads PDFs, let me know and I’ll update this section.)*
+Shabbir Hardwarewala
 
----
+## 🚀 Features
+- Extracts key details like **Billing Period**, **Total Due**, and **Transactions**
+- Supports multiple banks
+- Displays supported banks clearly in the interface
+- Shows the chosen file name
+- Generates clean, easy-to-read outputs
 
-## **Tech Stack**
+## 🧠 How It Works
+1. Upload a statement file  
+2. The program parses and extracts all data fields  
+3. Displays key info including billing period and bank name  
+4. Outputs important details from the credit card statement
 
-* **Python 3**
-* **Pandas** (data cleaning & analysis)
-* **NumPy**
-* **matplotlib / seaborn** (optional for graphs)
-* **tabula / pdfplumber** (if you're parsing PDFs)
+<img width="832" height="740" alt="Screenshot 2025-10-22 at 12 27 34 PM" src="https://github.com/user-attachments/assets/613446cc-5c26-429f-a051-3d5bd79e1520" />
+<img width="832" height="740" alt="Screenshot 2025-10-22 at 12 27 54 PM" src="https://github.com/user-attachments/assets/a0c4c967-04c1-45df-92b1-19694ea0e455" />
 
----
 
-## **Project Structure**
 
-```
-CreditCardStatementAnalyser/
-│── data/                    # Sample statements
-│── output/                  # Processed files & summaries
-│── src/
-│    ├── parser.py           # Reads and cleans statement data
-│    ├── categorizer.py      # Categorizes transactions
-│    ├── analyzer.py         # Generates insights
-│    └── visualizer.py       # Optional charts
-│── main.py                  # Entry point
-│── requirements.txt
-│── README.md
-```
-
----
-
-## **How to Use**
-
-1. Install dependencies:
-
+## ⚙️ Setup
 ```bash
+git clone https://github.com/Shabbirh10/Projects.git
+cd Projects/CreditCardStatement
 pip install -r requirements.txt
-```
-
-2. Place your statement file in the `data/` folder.
-
-3. Run the script:
-
-```bash
 python main.py
-```
-
-4. The cleaned transactions and summary will appear inside the `output/` folder.
-
----
-
-## **Why I Built This**
-
-I wanted a simple way to understand my spending without relying on complicated apps. This project helped me practice:
-
-* Data cleaning
-* Working with financial datasets
-* Categorizing real transactions
-* Python scripting and modular code design
-
----
-
-## **Possible Future Improvements**
-
-* Automatic PDF reading
-* More advanced categorization using ML
-* Monthly/Yearly dashboards
-* A small GUI or web interface
-* Export to Excel / Google Sheets
 
