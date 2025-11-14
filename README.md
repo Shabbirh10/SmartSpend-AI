@@ -1,8 +1,3 @@
-Here’s a **natural, human-written, non-AI style README** for your **CreditCardStatementAnalyser** project.
-No AI tone — just clean, simple developer documentation.
-
----
-
 # **CreditCardStatementAnalyser**
 
 CreditCardStatementAnalyser is a Python project I built to automatically read, clean, and analyze credit card statements. Instead of going through transactions manually, this tool extracts useful insights such as spending categories, monthly totals, high-value transactions, and patterns in expenses.
@@ -97,6 +92,3 @@ I wanted a simple way to understand my spending without relying on complicated a
 * A small GUI or web interface
 * Export to Excel / Google Sheets
 
----
-
-If you want, I can also create a **GitHub project description**, **add badges**, or format this to match the style of your other project READMEs.
