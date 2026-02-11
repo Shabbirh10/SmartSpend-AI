@@ -1,0 +1,353 @@
+description,category
+UBER *TRIP,Transport
+UBER EATS,Food
+STARBUCKS,Food
+NETFLIX.COM,Entertainment
+AMZN Mktp,Shopping
+Shell Station,Transport
+Spotify,Entertainment
+Trader Joe's,Groceries
+Whole Foods,Groceries
+Gym Membership,Health
+Apple Store,Shopping
+Lyft Ride,Transport
+McDonalds,Food
+CVS Pharmacy,Health
+Doordash,Food
+Airbnb,Travel
+Delta Airlines,Travel
+Steam Games,Entertainment
+Coursera,Education
+Udemy,Education
+HBO Max,Entertainment
+Target,Shopping
+Walmart,Groceries
+ExxonMobil,Transport
+Kroger,Groceries
+Walgreens,Health
+Cinema City,Entertainment
+Dominos Pizza,Food
+Burger King,Food
+Subway,Food
+Best Buy,Shopping
+IKEA,Shopping
+H&M,Shopping
+Zara,Shopping
+Uniqlo,Shopping
+Gap,Shopping
+Nike,Shopping
+Adidas,Shopping
+Lululemon,Shopping
+Sephora,Beauty
+Ulta,Beauty
+MAC Cosmetics,Beauty
+Clinique,Beauty
+Estee Lauder,Beauty
+L'Oreal,Beauty
+Maybelline,Beauty
+Revlon,Beauty
+CoverGirl,Beauty
+NARS,Beauty
+Urban Decay,Beauty
+Too Faced,Beauty
+Benefit,Beauty
+Anastasia Beverly Hills,Beauty
+Huda Beauty,Beauty
+Fenty Beauty,Beauty
+Kylie Cosmetics,Beauty
+KKW Beauty,Beauty
+Jeffree Star Cosmetics,Beauty
+Morphe,Beauty
+ColourPop,Beauty
+Glossier,Beauty
+Drunk Elephant,Beauty
+Tatcha,Beauty
+Sunday Riley,Beauty
+The Ordinary,Beauty
+CeraVe,Beauty
+La Roche-Posay,Beauty
+Neutrogena,Beauty
+Aveeno,Beauty
+Cetaphil,Beauty
+Olay,Beauty
+L'Occitane,Beauty
+Kiehl's,Beauty
+Origins,Beauty
+Clarins,Beauty
+Shiseido,Beauty
+Lancome,Beauty
+Dior,Beauty
+Chanel,Beauty
+Gucci,Beauty
+YSL,Beauty
+Givenchy,Beauty
+Tom Ford,Beauty
+Marc Jacobs,Beauty
+Burberry,Beauty
+Versace,Beauty
+Prada,Beauty
+Miu Miu,Beauty
+Fendi,Beauty
+Valentino,Beauty
+Dolce & Gabbana,Beauty
+Armani,Beauty
+Hermes,Beauty
+Louis Vuitton,Beauty
+Celine,Beauty
+Balenciaga,Beauty
+Saint Laurent,Beauty
+Bottega Veneta,Beauty
+Alexander McQueen,Beauty
+Stella McCartney,Beauty
+Chloe,Beauty
+Loewe,Beauty
+Marni,Beauty
+Jil Sander,Beauty
+The Row,Beauty
+Khaite,Beauty
+Toteme,Beauty
+Acne Studios,Beauty
+Ganni,Beauty
+Nanushka,Beauty
+Reformation,Beauty
+Realisation Par,Beauty
+Rouje,Beauty
+Sezane,Beauty
+Maje,Beauty
+Sandro,Beauty
+Comptoir des Cotonniers,Beauty
+Zadig & Voltaire,Beauty
+Ba&sh,Beauty
+Iro,Beauty
+Isabel Marant,Beauty
+Vanessa Bruno,Beauty
+Gerard Darel,Beauty
+The Kooples,Beauty
+Claudie Pierlot,Beauty
+Tara Jarmon,Beauty
+Des Petits Hauts,Beauty
+Soeur,Beauty
+Balzac Paris,Beauty
+Musier Paris,Beauty
+Les Filles en Rouje,Beauty
+Patou,Beauty
+Courreges,Beauty
+Coperni,Beauty
+Jacquemus,Beauty
+Marine Serre,Beauty
+Mugler,Beauty
+Alaia,Beauty
+Schiaparelli,Beauty
+Paco Rabanne,Beauty
+Jean Paul Gaultier,Beauty
+Maison Margiela,Beauty
+Rick Owens,Beauty
+Ann Demeulemeester,Beauty
+Yohji Yamamoto,Beauty
+Comme des Garcons,Beauty
+Issey Miyake,Beauty
+Junya Watanabe,Beauty
+Sacai,Beauty
+Undercover,Beauty
+Visvim,Beauty
+Kapital,Beauty
+Neighborhood,Beauty
+WTAPS,Beauty
+Sophnet,Beauty
+Uniform Experiment,Beauty
+FCRB,Beauty
+White Mountaineering,Beauty
+N.Hoolywood,Beauty
+Facetasm,Beauty
+Doublet,Beauty
+Ambush,Beauty
+Off-White,Beauty
+Palm Angels,Beauty
+Heron Preston,Beauty
+Marcelo Burlon,Beauty
+Fear of God,Beauty
+Essentials,Beauty
+Rhude,Beauty
+Amiri,Beauty
+Gallery Dept,Beauty
+Chrome Hearts,Beauty
+Rick Owens Drkshdw,Beauty
+Y-3,Beauty
+Stone Island,Beauty
+CP Company,Beauty
+Moncler,Beauty
+Canada Goose,Beauty
+Arc'teryx,Beauty
+Veilance,Beauty
+Acronym,Beauty
+NikeLab,Beauty
+Adidas Consortium,Beauty
+New Balance,Beauty
+Asics,Beauty
+Salomon,Beauty
+Hoka One One,Beauty
+On Running,Beauty
+Brooks,Beauty
+Saucony,Beauty
+Mizuno,Beauty
+Reebok,Beauty
+Puma,Beauty
+Vans,Beauty
+Converse,Beauty
+Dr. Martens,Beauty
+Timberland,Beauty
+Clarks,Beauty
+Birkenstock,Beauty
+Crocs,Beauty
+Ugg,Beauty
+Hunter,Beauty
+Sorel,Beauty
+Red Wing,Beauty
+Wolverine,Beauty
+Thorogood,Beauty
+Danner,Beauty
+Chippewa,Beauty
+Frye,Beauty
+Allen Edmonds,Beauty
+Alden,Beauty
+Church's,Beauty
+Tricker's,Beauty
+Crockett & Jones,Beauty
+Edward Green,Beauty
+John Lobb,Beauty
+Berluti,Beauty
+Santoni,Beauty
+Tod's,Beauty
+Ferragamo,Beauty
+Gucci,Beauty
+Prada,Beauty
+Louis Vuitton,Beauty
+Hermes,Beauty
+Chanel,Beauty
+Dior,Beauty
+Saint Laurent,Beauty
+Balenciaga,Beauty
+Bottega Veneta,Beauty
+Celine,Beauty
+Loewe,Beauty
+Marni,Beauty
+Jil Sander,Beauty
+The Row,Beauty
+Khaite,Beauty
+Toteme,Beauty
+Acne Studios,Beauty
+Ganni,Beauty
+Nanushka,Beauty
+Reformation,Beauty
+Realisation Par,Beauty
+Rouje,Beauty
+Sezane,Beauty
+Maje,Beauty
+Sandro,Beauty
+Comptoir des Cotonniers,Beauty
+Zadig & Voltaire,Beauty
+Ba&sh,Beauty
+Iro,Beauty
+Isabel Marant,Beauty
+Vanessa Bruno,Beauty
+Gerard Darel,Beauty
+The Kooples,Beauty
+Claudie Pierlot,Beauty
+Tara Jarmon,Beauty
+Des Petits Hauts,Beauty
+Soeur,Beauty
+Balzac Paris,Beauty
+Musier Paris,Beauty
+Les Filles en Rouje,Beauty
+Patou,Beauty
+Courreges,Beauty
+Coperni,Beauty
+Jacquemus,Beauty
+Marine Serre,Beauty
+Mugler,Beauty
+Alaia,Beauty
+Schiaparelli,Beauty
+Paco Rabanne,Beauty
+Jean Paul Gaultier,Beauty
+Maison Margiela,Beauty
+Rick Owens,Beauty
+Ann Demeulemeester,Beauty
+Yohji Yamamoto,Beauty
+Comme des Garcons,Beauty
+Issey Miyake,Beauty
+Junya Watanabe,Beauty
+Sacai,Beauty
+Undercover,Beauty
+Visvim,Beauty
+Kapital,Beauty
+Neighborhood,Beauty
+WTAPS,Beauty
+Sophnet,Beauty
+Uniform Experiment,Beauty
+FCRB,Beauty
+White Mountaineering,Beauty
+N.Hoolywood,Beauty
+Facetasm,Beauty
+Doublet,Beauty
+Ambush,Beauty
+Off-White,Beauty
+Palm Angels,Beauty
+Heron Preston,Beauty
+Marcelo Burlon,Beauty
+Fear of God,Beauty
+Essentials,Beauty
+Rhude,Beauty
+Amiri,Beauty
+Gallery Dept,Beauty
+Chrome Hearts,Beauty
+Rick Owens Drkshdw,Beauty
+Y-3,Beauty
+Stone Island,Beauty
+CP Company,Beauty
+Moncler,Beauty
+Canada Goose,Beauty
+Arc'teryx,Beauty
+Veilance,Beauty
+Acronym,Beauty
+NikeLab,Beauty
+Adidas Consortium,Beauty
+New Balance,Beauty
+Asics,Beauty
+Salomon,Beauty
+Hoka One One,Beauty
+On Running,Beauty
+Brooks,Beauty
+Saucony,Beauty
+Mizuno,Beauty
+Reebok,Beauty
+Puma,Beauty
+Vans,Beauty
+Converse,Beauty
+Dr. Martens,Beauty
+Timberland,Beauty
+Clarks,Beauty
+Birkenstock,Beauty
+Crocs,Beauty
+Ugg,Beauty
+Hunter,Beauty
+Sorel,Beauty
+Red Wing,Beauty
+Wolverine,Beauty
+Thorogood,Beauty
+Danner,Beauty
+Chippewa,Beauty
+Frye,Beauty
+Allen Edmonds,Beauty
+Alden,Beauty
+Church's,Beauty
+Tricker's,Beauty
+Crockett & Jones,Beauty
+Edward Green,Beauty
+John Lobb,Beauty
+Berluti,Beauty
+Santoni,Beauty
+Tod's,Beauty
+Ferragamo,Beauty
+Gucci,Shopping
+Prada,Shopping
+Louis Vuitton,Shopping
