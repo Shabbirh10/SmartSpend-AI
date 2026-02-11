@@ -6,7 +6,7 @@ SmartSpend AI isn't just another dashboard—it's an **intelligent financial ass
 
 Now, I just drag-and-drop my PDF statement, and within seconds, I’m chatting with my data.
 
-![SmartSpend AI Demo](https://placehold.co/800x400?text=SmartSpend+AI+Dashboard)
+![SmartSpend AI Dashboard](assets/dashboard.png)
 
 ## ✨ Why This Exists
 Banking apps are great for checking balances, but terrible for *insights*. I wanted to answer questions like:
