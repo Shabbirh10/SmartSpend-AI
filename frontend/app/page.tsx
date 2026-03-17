@@ -143,7 +143,7 @@ export default function Dashboard() {
                   <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    formatter={(value: number) => [`$${value}`, 'Amount']}
+                    formatter={(value) => [`$${Number(value ?? 0)}`, 'Amount']}
                   />
                   <Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={3} dot={{ strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
