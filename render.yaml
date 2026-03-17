@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: smartspend-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: PYTHONPATH=.. python init_db.py && PYTHONPATH=.. gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:app
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: DATABASE_URL
+        # Render Free doesn't include a managed Postgres by default; this keeps it simple.
+        value: sqlite:////opt/render/project/src/backend/instance/smartspend.db
+

@@ -1,0 +1,16 @@
+.DS_Store
+
+# Python
+.venv/
+**/__pycache__/
+**/*.pyc
+
+# Backend runtime
+backend/uploads/
+backend/instance/
+*.db
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+

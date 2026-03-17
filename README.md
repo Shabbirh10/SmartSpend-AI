@@ -36,7 +36,7 @@ I use **Ollama** to run Llama 3 locally. Your financial data never leaves your m
 ## 🛠️ Tech Stack
 I built this to be production-ready, not just a script.
 
-*   **Frontend:** **Next.js 14** (App Router) + Tailwind CSS + Recharts
+*   **Frontend:** **Next.js** (App Router) + Tailwind CSS + Recharts
 *   **Backend:** **Flask** (Python) + SQLAlchemy
 *   **Machine Learning:** Scikit-Learn + Pandas
 *   **GenAI:** Ollama (Llama 3)
@@ -65,6 +65,48 @@ I've included a **Demo Mode** so you can try it instantly.
 *   Adding support for multi-statement trend analysis.
 *   Dockerizing the entire stack for one-click deployment.
 *   Fine-tuning a smaller model (like Phi-3) for even faster CPU inference.
+
+## 🐳 Docker (one command)
+If you have Docker Desktop running:
+
+```bash
+docker compose up --build
+```
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000/health`
+
+## 🌐 Deploy (recruiter-ready)
+This repo deploys cleanly as **2 services**: a Flask API + a Next.js web app.
+
+### Backend (Render)
+- **Service type**: Web Service
+- **Root directory**: `backend`
+- **Build command**:
+
+```bash
+pip install -r requirements.txt
+```
+
+- **Start command**:
+
+```bash
+PYTHONPATH=.. python init_db.py && PYTHONPATH=.. gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:app
+```
+
+After deploy, your API base URL will look like:
+- `https://<your-render-service>.onrender.com/api`
+
+### Frontend (Vercel)
+- Import the `frontend` directory as a Vercel project.
+- Set the environment variable:
+  - `NEXT_PUBLIC_API_URL` = `https://<your-render-service>.onrender.com/api`
+
+Deploy, then open your Vercel URL and you’re ready to demo.
+
+### Notes
+- **Ollama**: The chat endpoint will gracefully fall back if Ollama isn’t running (useful for cloud demos).
+- **ML model**: The backend auto-trains a compatible classifier if the bundled pickle is missing/incompatible.
 
 ---
 *Built with ❤️ (and a lot of coffee) by Shabbir Hardwarewala.*
