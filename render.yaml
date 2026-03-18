@@ -14,4 +14,6 @@ services:
       - key: DATABASE_URL
         # Render Free doesn't include a managed Postgres by default; this keeps it simple.
         value: sqlite:////opt/render/project/src/backend/instance/smartspend.db
+      - key: OPENAI_API_KEY
+        sync: false  # Set manually in Render dashboard
 
