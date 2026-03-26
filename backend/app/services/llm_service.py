@@ -1,7 +1,9 @@
 import google.generativeai as genai
 import json
+import os
 
-genai.configure(api_key="AIzaSyAetw4WP48GW2pCtwCJASf00U2hqaWmJxQ")
+api_key = os.environ.get("GEMINI_API_KEY", "AIzaSyAetw4WP48GW2pCtwCJASf00U2hqaWmJxQ")
+genai.configure(api_key=api_key)
 
 class LLMService:
     def __init__(self, model="gemini-1.5-flash"):
