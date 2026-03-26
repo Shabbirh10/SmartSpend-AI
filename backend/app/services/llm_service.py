@@ -6,7 +6,7 @@ api_key = os.environ.get("GEMINI_API_KEY", "AIzaSyAetw4WP48GW2pCtwCJASf00U2hqaWm
 genai.configure(api_key=api_key)
 
 class LLMService:
-    def __init__(self, model="gemini-1.5-flash"):
+    def __init__(self, model="gemini-2.5-flash"):
         self.model_name = model
 
     def chat(self, prompt):
