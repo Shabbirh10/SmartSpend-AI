@@ -29,7 +29,7 @@ export function ChatBot() {
             const res = await chatWithAI(input);
             setMessages(prev => [...prev, { role: 'assistant', content: res.response }]);
         } catch (error) {
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encounted an error. Make sure Ollama is running!' }]);
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encounted an error. Make sure Gemini API is working!' }]);
         } finally {
             setLoading(false);
         }
@@ -79,7 +79,7 @@ export function ChatBot() {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                     placeholder="Ask a question..."
-                    className="flex-1 border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 border rounded-lg px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
                     onClick={handleSend}
