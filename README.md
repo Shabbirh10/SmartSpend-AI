@@ -14,7 +14,7 @@ Banking apps are great for checking balances, but terrible for *insights*. I wan
 *   *"What are my recurring subscriptions?"*
 *   *"Did I spend more than $500 on groceries?"*
 
-Instead of clicking filters, I built a RAG-powered chatbot (using **Llama 3**) so I can just *ask*.
+Instead of clicking filters, I built a RAG-powered chatbot (using **Gemini**) so I can just *ask*.
 
 ## 🚀 Features Under the Hood
 
@@ -29,8 +29,8 @@ I didn't want to rely on generic APIs. I trained a **Random Forest Classifier** 
 *   **Input:** "AMZN MKTP US*1A2B" -> **Output:** "Shopping"
 *   It learns from my data and gets smarter over time.
 
-### 3. 💬 Privacy-First Financial Chat
-I use **Ollama** to run Llama 3 locally. Your financial data never leaves your machine.
+### 3. 💬 AI-Powered Financial Chat
+I use **Google Gemini API** to power the chatbot.
 *   **RAG (Retrieval Augmented Generation):** The bot reads your recent transactions and gives context-aware answers.
 
 ## 🛠️ Tech Stack
@@ -39,7 +39,7 @@ I built this to be production-ready, not just a script.
 *   **Frontend:** **Next.js** (App Router) + Tailwind CSS + Recharts
 *   **Backend:** **Flask** (Python) + SQLAlchemy
 *   **Machine Learning:** Scikit-Learn + Pandas
-*   **GenAI:** Ollama (Llama 3)
+*   **GenAI:** Google Gemini API
 *   **Database:** PostgreSQL / SQLite
 
 ## ⚡ Quick Start
@@ -105,7 +105,7 @@ After deploy, your API base URL will look like:
 Deploy, then open your Vercel URL and you’re ready to demo.
 
 ### Notes
-- **Ollama**: The chat endpoint will gracefully fall back if Ollama isn’t running (useful for cloud demos).
+- **Gemini API**: The chat endpoint uses Google's Gemini API for fast and intelligent responses. Ensure your API key is correctly configured.
 - **ML model**: The backend auto-trains a compatible classifier if the bundled pickle is missing/incompatible.
 
 ---

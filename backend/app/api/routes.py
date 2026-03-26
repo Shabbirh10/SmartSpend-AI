@@ -96,7 +96,7 @@ def chat():
     recent_txns = Transaction.query.order_by(Transaction.date.desc()).limit(10).all()
     context = "\n".join([f"{t.date}: {t.description} - ${t.amount} ({t.category})" for t in recent_txns])
     
-    # 2. Construct Prompt for Ollama
+    # 2. Construct Prompt for Gemini
     try:
         from app.services.llm_service import llm
         prompt = f"""
@@ -105,15 +105,13 @@ def chat():
         
         User Question: {query}
         """
-        response = llm.categorise_transaction(query, 0) # Abusing categorise for chat to save lines or make a new method
-        # Ideally, LLMService should have a 'chat' method. Let's assume we update LLMService or use 'ollama.chat' directly here.
-        # But for 'code correctness', let's use the actual library here or update LLMService.
-        # Let's use ollama directly here for simplicity if LLMService isn't perfect.
-        import ollama
-        res = ollama.chat(model='llama3', messages=[{'role': 'user', 'content': prompt}])
-        return jsonify({'response': res['message']['content']})
+        res = llm.chat(prompt)
+        if res:
+            return jsonify({'response': res})
+        else:
+            return jsonify({'response': "AI is currently offline.", 'error': "Failed to generate response"})
     except Exception as e:
-        return jsonify({'response': "AI is currently offline (Ollama not running).", 'error': str(e)})
+        return jsonify({'response': "AI is currently offline.", 'error': str(e)})
 
 @api_bp.route('/analytics/trends', methods=['GET'])
 def get_trends():
