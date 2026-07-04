@@ -1,73 +1,78 @@
-import joblib
-import os
-import pandas as pd
-import sys
-import warnings
+import re
+
+CATEGORY_RULES = {
+    "Food": [
+        "zomato", "swiggy", "mcdonalds", "mcdonald", "kfc", "dominos", "pizza hut",
+        "burger king", "subway", "starbucks", "cafe coffee day", "haldirams", "barbeque",
+        "box8", "faasos", "biryani", "behrouz", "licious", "freshmenu", "eatfit",
+        "rebel foods", "uber eats", "doordash", "uber eat", "food", "restaurant",
+        "dining", "cafe", "bakery", "dhaba",
+    ],
+    "Transport": [
+        "uber", "ola", "rapido", "metro card", "best bus", "irctc", "redbus",
+        "indian railways", "railway", "indian oil", "bharat petroleum", "hpcl", "bpcl",
+        "petrol", "fuel", "exxon", "shell", "lyft", "cab", "taxi", "auto",
+        "parking", "fastag", "toll",
+    ],
+    "Shopping": [
+        "amazon", "flipkart", "myntra", "meesho", "snapdeal", "nykaa fashion",
+        "ajio", "tata cliq", "reliance digital", "croma", "vijay sales", "lenskart",
+        "ebay", "paypal", "lululemon", "ikea", "h&m", "zara", "best buy", "target",
+        "walmart", "apple store", "nike", "adidas",
+    ],
+    "Groceries": [
+        "bigbasket", "grofers", "jiomart", "blinkit", "zepto", "dmart", "d-mart",
+        "more supermarket", "nature's basket", "milk basket", "country delight",
+        "kroger", "trader joe", "whole foods", "safeway",
+    ],
+    "Entertainment": [
+        "netflix", "netfix", "hotstar", "disney", "prime video", "sonyliv", "zee5",
+        "mx player", "voot", "altbalaji", "jiocinema", "aha", "eros now", "bookmyshow",
+        "pvr", "inox", "spotify", "youtube premium", "gaana", "jiosaavn", "wynk",
+        "steam", "cinema", "movie", "theatre", "concert", "gaming",
+    ],
+    "Utilities": [
+        "jio", "airtel", "bsnl", "vodafone", "vi mobile", "mseb", "bescom",
+        "tata power", "adani electricity", "cesc", "bwssb", "mahanagar gas",
+        "broadband", "act fibernet", "hathway", "electricity", "water bill",
+        "gas bill", "recharge", "prepaid",
+    ],
+    "Health": [
+        "apollo pharmacy", "medplus", "netmeds", "1mg", "pharmeasy", "practo",
+        "doctor", "hospital", "clinic", "fortis", "max hospital", "manipal",
+        "pharmacy", "medicine", "medical", "health", "co-pay", "insurance",
+        "diagnostic", "lab test",
+    ],
+    "Investment": [
+        "hdfc mutual", "sbi mutual", "zerodha", "groww", "paytm money", "upstox",
+        "angel broking", "icici direct", "kotak securities", "mutual fund",
+        "stock", "shares", "nse", "bse", "demat",
+    ],
+    "Beauty": [
+        "nykaa", "purplle", "sugar cosmetics", "mamaearth", "wow skin", "lakme",
+        "l'oreal", "himalaya", "forest essentials", "kama ayurveda", "lotus herbals",
+        "plum", "mcaffeine", "minimalist", "dot and key", "derma co", "re'equil",
+        "biotique", "salon", "saloon", "haircut", "spa", "beauty parlour",
+    ],
+    "Travel": [
+        "makemytrip", "yatra", "goibibo", "ixigo", "easemytrip", "oyo", "fabhotel",
+        "treebo", "airbnb", "indigo", "air india", "spicejet", "vistara", "go first",
+        "hotel", "resort", "flight", "airline", "travel", "booking",
+    ],
+    "Income": [
+        "salary", "neft", "credited", "imps credit", "freelance", "dividend",
+        "interest credited", "tech corp", "employer",
+    ],
+}
 
 class TransactionClassifier:
-    def __init__(self):
-        # Adjust path to where the model will be saved relative to this file
-        # Assuming app/services/classifier.py -> ../../../ml_engine/models/classifier.pkl
-        # Or ideally, copy the model to backend/app/models/ during deployment
-        self.model_path = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), '../../../ml_engine/models/classifier.pkl'
-        ))
-        self.model = None
-        self._load_model()
-
-    def _train_model(self):
-        try:
-            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
-            if repo_root not in sys.path:
-                sys.path.insert(0, repo_root)
-            from ml_engine.training.train_model import train
-            train()
-            return True
-        except Exception as e:
-            print(f"Error training model: {e}")
-            return False
-
-    def _load_model(self):
-        try:
-            if os.path.exists(self.model_path):
-                with warnings.catch_warnings(record=True) as caught:
-                    warnings.simplefilter("always")
-                    self.model = joblib.load(self.model_path)
-
-                should_retrain = False
-                for w in caught:
-                    if w.category.__name__ == "InconsistentVersionWarning":
-                        should_retrain = True
-                        break
-
-                if should_retrain:
-                    print("Warning: Model pickle version mismatch detected. Retraining model for compatibility...")
-                    self.model = None
-                else:
-                    print("ML Model loaded successfully.")
-            else:
-                print(f"Warning: ML model not found at {self.model_path}. Categorization will use fallback.")
-        except Exception as e:
-            print(f"Error loading model: {e}")
-            self.model = None
-
-        if not self.model:
-            if self._train_model() and os.path.exists(self.model_path):
-                try:
-                    self.model = joblib.load(self.model_path)
-                    print("ML Model trained and loaded successfully.")
-                except Exception as e:
-                    print(f"Error loading newly trained model: {e}")
-
-    def predict(self, description):
-        if not self.model:
-            return "Uncategorized"
-        try:
-            # Predict expects a list/series
-            prediction = self.model.predict([description])
-            return prediction[0]
-        except Exception as e:
-            print(f"Prediction error: {e}")
-            return "Uncategorized"
+    def predict(self, description: str) -> str:
+        desc = description.lower()
+        for category, keywords in CATEGORY_RULES.items():
+            for kw in keywords:
+                if kw in desc:
+                    return category
+        return "Other"
 
 classifier = TransactionClassifier()
+

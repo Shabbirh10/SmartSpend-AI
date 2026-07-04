@@ -2,111 +2,147 @@
 
 > *Stop wondering where your money went. Start asking it.*
 
-SmartSpend AI isn't just another dashboard—it's an **intelligent financial assistant** that lives on your laptop. I built this because I was tired of manually exporting CSVs and fighting with Excel formulas just to see if I spent too much on coffee.
+SmartSpend AI is a full-stack intelligent financial assistant that turns your messy PDF bank statements into structured, actionable insights — in seconds. Drag and drop your statement, and start chatting with your own data.
 
-Now, I just drag-and-drop my PDF statement, and within seconds, I’m chatting with my data.
+<br/>
 
-![SmartSpend AI Dashboard](assets/dashboard.png)
+![Upload Interface](assets/screenshot_upload.jpg)
 
-## ✨ Why This Exists
-Banking apps are great for checking balances, but terrible for *insights*. I wanted to answer questions like:
-*   *"How much did I spend on Uber this month vs last month?"*
-*   *"What are my recurring subscriptions?"*
-*   *"Did I spend more than $500 on groceries?"*
+<br/>
 
-Instead of clicking filters, I built a RAG-powered chatbot (using **Gemini**) so I can just *ask*.
+## 📸 Screenshots
 
-## 🚀 Features Under the Hood
+### Dashboard
+![Dashboard](assets/screenshot_dashboard.jpg)
 
-### 1. 🧠 Hybrid Parsing Engine
-PDFs are messy. I use a hybrid approach:
-*   **Regex** for the easy stuff (dates, amounts).
-*   **LLM Fallback** for the weirdly formatted lines that usually break parsers.
-*   *Result:* It parses statements that other tools choke on.
+### AI Financial Chat
+![Chat](assets/screenshot_chat.jpg)
 
-### 2. 🤖 Custom ML Classification
-I didn't want to rely on generic APIs. I trained a **Random Forest Classifier** (using Scikit-Learn) on transaction descriptions.
-*   **Input:** "AMZN MKTP US*1A2B" -> **Output:** "Shopping"
-*   It learns from my data and gets smarter over time.
+<br/>
 
-### 3. 💬 AI-Powered Financial Chat
-I use **Google Gemini API** to power the chatbot.
-*   **RAG (Retrieval Augmented Generation):** The bot reads your recent transactions and gives context-aware answers.
+## ✨ Features
+
+### 🧠 Hybrid PDF Parsing Engine
+Bank PDFs come in every format imaginable. SmartSpend handles them all:
+- **Regex** extraction for structured fields (dates, amounts, descriptions)
+- **LLM fallback** for non-standard, poorly-formatted statements
+- Processes 80+ transactions in real-time with a live progress indicator
+
+### 🤖 Custom ML Transaction Classifier
+A Random Forest Classifier (Scikit-Learn) trained on real transaction descriptions:
+- `"SWIGGY ORDER #1234"` → **Food & Dining**
+- `"AMZN MKTP US*1A2B"` → **Shopping**
+- `"UBER TRIP"` → **Transport**
+- Detects anomalies and duplicate charges automatically
+
+### 💬 RAG-Powered Financial Chatbot
+Ask natural language questions about your spending, powered by **Google Gemini**:
+- *"How much did I spend on Swiggy this month?"*
+- *"Any suspicious transactions in November?"*
+- *"What are my recurring subscriptions?"*
+- Streaming responses with real-time token output
+
+### 📊 Rich Analytics Dashboard
+- Monthly **spending trend** area chart
+- **Category breakdown** with visual bars
+- **Subscription tracker** — auto-detects Netflix, Spotify, Jio, etc.
+- **Portfolio tracker** with live stock data via yfinance
+- **ET Markets financial news** feed
+
+<br/>
 
 ## 🛠️ Tech Stack
-I built this to be production-ready, not just a script.
 
-*   **Frontend:** **Next.js** (App Router) + Tailwind CSS + Recharts
-*   **Backend:** **Flask** (Python) + SQLAlchemy
-*   **Machine Learning:** Scikit-Learn + Pandas
-*   **GenAI:** Google Gemini API
-*   **Database:** PostgreSQL / SQLite
+| Layer | Technology |
+|---|---|
+| **Frontend** | Next.js 15 (App Router) · Tailwind CSS · Recharts · Framer Motion |
+| **Backend** | Flask · SQLAlchemy · Celery · Flask-Limiter · Flask-Caching |
+| **ML Engine** | Scikit-Learn · Pandas · Random Forest Classifier |
+| **GenAI** | Google Gemini API (RAG + streaming) |
+| **Database** | SQLite (dev) · PostgreSQL (prod) |
+| **Infrastructure** | Docker · Docker Compose · Terraform · Render · Vercel |
+
+<br/>
 
 ## ⚡ Quick Start
 
-I've included a **Demo Mode** so you can try it instantly.
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- A [Google Gemini API key](https://aistudio.google.com/)
 
-1.  **Clone & Setup**
-    ```bash
-    git clone https://github.com/Shabbirh10/SmartSpend-AI.git
-    cd SmartSpend-AI
-    ./start_app.sh
-    ```
+### 1. Clone the repo
+```bash
+git clone https://github.com/Shabbirh10/SmartSpend-AI.git
+cd SmartSpend-AI
+```
 
-2.  **That's it.**
-    *   The script sets up the database, trains the ML model, and launches the servers.
-    *   Go to `http://localhost:3000`.
+### 2. Set up environment
+```bash
+# Backend
+cp backend/.env.example backend/.env
+# Edit backend/.env and add your GEMINI_API_KEY
+```
 
-3.  **Try the Demo**
-    *   Click **"Sample PDF"** in the top right to download a realistic (but fake) statement.
-    *   Upload it and watch the AI analyze 80+ transactions in real-time.
+### 3. One-command startup
+```bash
+chmod +x start_app.sh
+./start_app.sh
+```
 
-## 🔮 What's Next?
-*   Adding support for multi-statement trend analysis.
-*   Dockerizing the entire stack for one-click deployment.
-*   Fine-tuning a smaller model (like Phi-3) for even faster CPU inference.
+This script will:
+- Create a Python virtual environment
+- Install all backend dependencies
+- Train the ML classifier
+- Initialize the database
+- Start the Flask backend on `http://localhost:8000`
+- Install frontend packages and start Next.js on `http://localhost:3000`
+
+### 4. Try the demo
+- Open `http://localhost:3000`
+- Click **"Sample PDF"** in the top right to download a realistic fake bank statement
+- Upload it and watch 80+ transactions get parsed, classified, and analyzed in real-time
+
+<br/>
 
 ## 🐳 Docker (one command)
-If you have Docker Desktop running:
 
 ```bash
 docker compose up --build
 ```
 
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8000/health`
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8000/health |
 
-## 🌐 Deploy (recruiter-ready)
-This repo deploys cleanly as **2 services**: a Flask API + a Next.js web app.
+<br/>
 
-### Backend (Render)
-- **Service type**: Web Service
-- **Root directory**: `backend`
-- **Build command**:
+## 🌐 Deploy
 
-```bash
-pip install -r requirements.txt
-```
+This repo is structured for clean deployment as two independent services.
 
-- **Start command**:
+### Backend → Render
+1. Create a **Web Service** pointing to the `backend/` directory
+2. **Build command:** `pip install -r requirements.txt`
+3. **Start command:** `PYTHONPATH=.. python init_db.py && PYTHONPATH=.. gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:app`
+4. Add environment variable: `GEMINI_API_KEY` = your key
 
-```bash
-PYTHONPATH=.. python init_db.py && PYTHONPATH=.. gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:app
-```
+### Frontend → Vercel
+1. Import the `frontend/` directory as a Vercel project
+2. Add environment variable: `NEXT_PUBLIC_API_URL` = `https://<your-render-service>.onrender.com/api`
 
-After deploy, your API base URL will look like:
-- `https://<your-render-service>.onrender.com/api`
+<br/>
 
-### Frontend (Vercel)
-- Import the `frontend` directory as a Vercel project.
-- Set the environment variable:
-  - `NEXT_PUBLIC_API_URL` = `https://<your-render-service>.onrender.com/api`
+## 🔮 Roadmap
 
-Deploy, then open your Vercel URL and you’re ready to demo.
+- [ ] Multi-statement trend analysis (compare months/quarters)
+- [ ] Budget alerts & spending limits
+- [ ] Support for more PDF formats (HDFC, ICICI, SBI)
+- [ ] Export to CSV / Excel
 
-### Notes
-- **Gemini API**: The chat endpoint uses Google's Gemini API for fast and intelligent responses. Ensure your API key is correctly configured.
-- **ML model**: The backend auto-trains a compatible classifier if the bundled pickle is missing/incompatible.
+<br/>
 
 ---
-*Built with ❤️ (and a lot of coffee) by Shabbir Hardwarewala.*
+
+*Built by [Shabbir Hardwarewala](https://github.com/Shabbirh10)*

@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { uploadStatement, getTransactions, getTrends, getSubscriptions, downloadDemoStatement } from '../lib/api';
+import { useState, useEffect, useCallback } from 'react';
+import { uploadStatement, getTaskStatus, getTransactions, getTrends, getSubscriptions, downloadDemoStatement, getIndianFinancialNews, getCategories } from '../lib/api';
 import { SpendingChart } from '../components/dashboard/spending-chart';
 import { ChatBot } from '../components/dashboard/chat-bot';
-import { Upload, FileText, AlertCircle, Download, TrendingUp, CreditCard } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Pagination } from '../components/ui/pagination';
+import { Upload, FileText, Download, TrendingUp, CreditCard, Loader2, Sparkles, Smile, ShieldAlert, Newspaper } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+
+import { ProLayout } from '../components/dashboard/pro-layout';
 
 interface Transaction {
   id: number;
@@ -16,33 +19,91 @@ interface Transaction {
   is_anomaly: boolean;
 }
 
+interface PaginationMeta {
+  page: number;
+  per_page: number;
+  total: number;
+  total_pages: number;
+}
+
+const TRANSACTIONS_PER_PAGE = 10;
+const SUBSCRIPTIONS_PER_PAGE = 6;
+const NEWS_PER_PAGE = 4;
+
 export default function Dashboard() {
+  const [proMode, setProMode] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [txnPagination, setTxnPagination] = useState<PaginationMeta>({
+    page: 1, per_page: TRANSACTIONS_PER_PAGE, total: 0, total_pages: 1,
+  });
+  const [txnLoading, setTxnLoading] = useState(false);
+
+  const [subscriptions, setSubscriptions] = useState<{ name: string; amount: number; frequency: string }[]>([]);
+  const [subsPagination, setSubsPagination] = useState<PaginationMeta>({
+    page: 1, per_page: SUBSCRIPTIONS_PER_PAGE, total: 0, total_pages: 1,
+  });
+  const [subsLoading, setSubsLoading] = useState(false);
+
   const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
   const [chartData, setChartData] = useState<{ name: string; value: number }[]>([]);
   const [trendData, setTrendData] = useState<{ date: string; amount: number }[]>([]);
-  const [subscriptions, setSubscriptions] = useState<{ name: string; amount: number; frequency: string }[]>([]);
+  const [newsData, setNewsData] = useState<{ title: string; link: string; pubDate: string }[]>([]);
+  const [newsPage, setNewsPage] = useState(1);
 
-  useEffect(() => {
-    fetchData();
+  const fetchTransactions = useCallback(async (page: number) => {
+    setTxnLoading(true);
+    try {
+      const res = await getTransactions(page, TRANSACTIONS_PER_PAGE);
+      setTransactions(res.data);
+      if (res.pagination) setTxnPagination(res.pagination);
+    } catch (error) {
+      console.error("Failed to fetch transactions", error);
+    } finally {
+      setTxnLoading(false);
+    }
   }, []);
 
-  const fetchData = async () => {
+  const fetchSubscriptions = useCallback(async (page: number) => {
+    setSubsLoading(true);
     try {
-      const res = await getTransactions();
-      setTransactions(res.data);
-      processChartData(res.data);
-
-      const trends = await getTrends();
-      setTrendData(trends.data);
-
-      const subs = await getSubscriptions();
+      const subs = await getSubscriptions(page, SUBSCRIPTIONS_PER_PAGE);
       setSubscriptions(subs.data);
-
+      if (subs.pagination) setSubsPagination(subs.pagination);
     } catch (error) {
-      console.error("Failed to fetch data", error);
+      console.error("Failed to fetch subscriptions", error);
+    } finally {
+      setSubsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        fetchTransactions(1),
+        fetchSubscriptions(1),
+        getTrends().then(trends => setTrendData(trends.data)).catch(console.error),
+        getIndianFinancialNews().then(news => setNewsData(news.data || [])).catch(console.error),
+        getCategories().then(cat => setChartData(cat.data || [])).catch(console.error),
+      ]);
+    };
+    fetchData();
+  }, [fetchTransactions, fetchSubscriptions]);
+
+  useEffect(() => {
+    if (proMode) {
+      document.body.classList.add('terminal-mode-body');
+      document.documentElement.classList.add('terminal-mode-body');
+    } else {
+      document.body.classList.remove('terminal-mode-body');
+      document.documentElement.classList.remove('terminal-mode-body');
+    }
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('terminal-mode-body');
+      document.documentElement.classList.remove('terminal-mode-body');
+    };
+  }, [proMode]);
 
   const processChartData = (data: Transaction[]) => {
     const categoryMap: Record<string, number> = {};
@@ -63,34 +124,90 @@ export default function Dashboard() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
     setUploading(true);
+    setUploadStatus("Uploading...");
+    
     try {
-      await uploadStatement(e.target.files[0]);
-      await fetchData(); // Refresh data
+      const uploadRes = await uploadStatement(e.target.files[0]);
+      const taskId = uploadRes.task_id;
+      
+      if (!taskId) throw new Error("No task_id returned from API");
+      
+      setUploadStatus("Processing...");
+      
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await getTaskStatus(taskId);
+          
+          if (statusRes.state === 'SUCCESS') {
+            clearInterval(pollInterval);
+            setUploading(false);
+            setUploadStatus("");
+            
+            await Promise.all([
+              fetchTransactions(1),
+              fetchSubscriptions(1),
+              getTrends().then(trends => setTrendData(trends.data)).catch(console.error),
+            ]);
+          } else if (statusRes.state === 'FAILURE') {
+            clearInterval(pollInterval);
+            setUploading(false);
+            setUploadStatus("");
+            alert(`Processing failed: ${statusRes.error || 'Server error'}`);
+          } else if (statusRes.status) {
+            setUploadStatus(statusRes.status);
+          }
+        } catch (pollError) {
+          clearInterval(pollInterval);
+          setUploading(false);
+          setUploadStatus("");
+          console.error("Polling failed", pollError);
+        }
+      }, 1500);
+      
     } catch (error) {
       console.error("Upload failed", error);
       alert("Upload failed!");
-    } finally {
       setUploading(false);
+      setUploadStatus("");
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6">
+  const handleTxnPageChange = (page: number) => {
+    fetchTransactions(page);
+    document.getElementById('transactions-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
-        {/* Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">SmartSpend AI</h1>
-            <p className="text-gray-500">Intelligent Financial Assistant</p>
+  const handleSubsPageChange = (page: number) => {
+    fetchSubscriptions(page);
+  };
+
+  const totalSpend = trendData.reduce((acc, curr) => acc + curr.amount, 0);
+
+  return (
+    <div className={`min-h-screen pb-20 selection:bg-[#c1121f] selection:text-white transition-colors duration-300 ${proMode ? 'bg-[#003049]' : 'bg-[#fdf0d5]'}`}>
+      
+      {/* Brutalist Navigation */}
+      <nav className={`border-b-4 sticky top-0 z-40 reveal-1 transition-colors ${proMode ? 'border-[#669bbc] bg-[#001f30] text-[#669bbc]' : 'border-[#003049] bg-[#fdf0d5]'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`w-10 h-10 flex items-center justify-center border-2 ${proMode ? 'bg-[#c1121f] border-[#669bbc]' : 'bg-[#c1121f] border-[#003049]'}`}>
+              <span className="text-white font-serif font-bold text-xl leading-none -mt-1">S</span>
+            </div>
+            <h1 className={`text-3xl font-serif tracking-tight uppercase ${proMode ? 'text-white' : 'text-[#003049]'}`}>SmartSpend</h1>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 font-mono text-xs sm:text-sm">
+            <button
+              onClick={() => setProMode(!proMode)}
+              className={`flex items-center gap-2 px-3 py-2 sm:px-4 border-2 transition-colors uppercase font-bold ${proMode ? 'border-[#669bbc] bg-[#c1121f] text-white hover:bg-[#780000]' : 'border-[#003049] bg-transparent text-[#003049] hover:bg-[#003049] hover:text-white'}`}
+            >
+              {proMode ? 'Exit Terminal' : 'Terminal'}
+            </button>
             <button
               onClick={downloadDemoStatement}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium"
+              className={`flex items-center gap-2 px-3 py-2 sm:px-4 border-2 transition-colors uppercase font-bold ${proMode ? 'border-[#669bbc] text-[#669bbc] hover:bg-[#669bbc] hover:text-[#001f30]' : 'border-[#003049] text-[#003049] hover:bg-[#003049] hover:text-white'}`}
             >
-              <Download size={18} />
-              Sample PDF
+              <Download size={16} />
+              <span className="hidden sm:inline">Sample</span>
             </button>
             <div className="relative">
               <input
@@ -103,123 +220,212 @@ export default function Dashboard() {
               />
               <label
                 htmlFor="file-upload"
-                className={`flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition font-medium shadow-md shadow-blue-200 ${uploading ? 'opacity-50' : ''}`}
+                className={`flex items-center gap-2 px-4 py-2 sm:px-6 border-2 bg-[#c1121f] hover:bg-[#780000] text-white cursor-pointer transition-colors uppercase font-bold active:translate-x-[2px] active:translate-y-[2px] ${proMode ? 'border-[#669bbc] shadow-[4px_4px_0px_0px_#669bbc] active:shadow-[2px_2px_0px_0px_#669bbc]' : 'border-[#003049] shadow-[4px_4px_0px_0px_#003049] active:shadow-[2px_2px_0px_0px_#003049]'} ${uploading ? 'opacity-60 pointer-events-none' : ''}`}
               >
-                <Upload size={18} />
-                {uploading ? 'Analyzing...' : 'Upload Statement'}
+                {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                <span className="hidden sm:inline">{uploading ? (uploadStatus || 'Processing') : 'Upload PDF'}</span>
+                <span className="sm:hidden">{uploading ? 'Wait' : 'Upload'}</span>
               </label>
             </div>
           </div>
-        </header>
+        </div>
+      </nav>
 
-        {/* Top Section: Charts & Chat */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Spending Distribution */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">Spending Breakdown</h2>
-            <SpendingChart data={chartData} />
+      {proMode ? (
+        <ProLayout trendData={trendData} />
+      ) : (
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 mt-12 space-y-12">
+        
+        {/* Massive Hero Number */}
+        <div className="py-8 reveal-2 border-y-2 border-[#003049] bg-white/50 backdrop-blur-sm px-8 flex flex-col md:flex-row items-center justify-between">
+          <div>
+            <h2 className="text-[120px] leading-none font-serif text-[#c1121f] tracking-tighter">
+              ₹{totalSpend.toFixed(2)}
+            </h2>
+            <p className="text-[#003049] font-mono font-bold uppercase tracking-widest text-sm mt-2">Total Amount Spent</p>
           </div>
-
-          {/* AI Chatbot */}
-          <div className="lg:col-span-2">
-            <ChatBot />
+          <div className="hidden md:block text-right font-mono text-[#669bbc] text-sm uppercase">
+            <p>System Status: <span className="text-[#c1121f] font-bold">Online</span></p>
+            <p>Transactions: <span className="text-[#003049] font-bold">{txnPagination.total}</span></p>
           </div>
         </div>
 
-        {/* Middle Section: Trends & Subscriptions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Trend Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
-                <TrendingUp size={20} />
+        {/* Top Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 reveal-3">
+          
+          <div className="playful-card p-0 lg:col-span-2 flex flex-col overflow-hidden">
+            <div className="p-6 border-b-2 border-[#003049] bg-[#003049] text-white flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Newspaper size={20} className="text-[#c1121f]" />
+                <h3 className="text-xl font-serif tracking-wide uppercase">Financial Markets News (India)</h3>
               </div>
-              <h2 className="text-lg font-semibold text-gray-800">Spending Trends</h2>
+              <span className="px-3 py-1 bg-[#c1121f] text-[10px] font-bold uppercase tracking-widest text-white border border-[#003049]">Live Feed</span>
             </div>
-            <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={trendData}>
-                  <XAxis dataKey="date" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    formatter={(value) => [`$${Number(value ?? 0)}`, 'Amount']}
-                  />
-                  <Line type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={3} dot={{ strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Subscriptions */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 bg-green-100 text-green-600 rounded-lg">
-                <CreditCard size={20} />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-800">Recurring Subscriptions</h2>
-            </div>
-            <div className="space-y-3">
-              {subscriptions.map((sub, i) => (
-                <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="font-medium text-gray-900">{sub.name}</div>
-                    <div className="text-xs text-gray-500">{sub.frequency}</div>
-                  </div>
-                  <div className="font-semibold text-gray-700">${sub.amount.toFixed(2)}</div>
+            
+            <div className="flex-1 w-full min-h-[320px] bg-white overflow-y-auto flex flex-col">
+              {newsData.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full flex-1 text-[#669bbc] gap-4">
+                  <Loader2 size={32} className="animate-spin text-[#c1121f]" />
+                  <p className="font-mono text-sm uppercase tracking-widest text-center">Fetching Latest<br/>Financial Headlines</p>
                 </div>
-              ))}
-              {subscriptions.length === 0 && (
-                <p className="text-gray-400 text-sm text-center py-4">No subscriptions detected yet.</p>
+              ) : (
+                <div className="flex flex-col flex-1">
+                  {newsData.slice((newsPage - 1) * NEWS_PER_PAGE, newsPage * NEWS_PER_PAGE).map((news, i) => (
+                    <a key={i} href={news.link} target="_blank" rel="noopener noreferrer" className="p-5 border-b border-[#003049]/10 hover:bg-[#fdf0d5] transition-colors group flex flex-col gap-2">
+                      <h4 className="font-bold text-[#003049] text-lg font-serif group-hover:text-[#c1121f] transition-colors leading-tight line-clamp-2">{news.title}</h4>
+                      <span className="text-[10px] font-bold text-[#669bbc] uppercase tracking-wider font-mono">{news.pubDate}</span>
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
+
+            {newsData.length > 0 && (
+              <div className="p-4 bg-[#fdf0d5] border-t-2 border-[#003049]">
+                <Pagination
+                  currentPage={newsPage}
+                  totalPages={Math.ceil(newsData.length / NEWS_PER_PAGE)}
+                  totalItems={newsData.length}
+                  perPage={NEWS_PER_PAGE}
+                  onPageChange={setNewsPage}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="playful-card flex flex-col overflow-hidden">
+            <div className="p-6 border-b-2 border-[#003049] bg-[#003049] text-white">
+              <h3 className="text-xl font-serif tracking-wide uppercase">Allocation</h3>
+            </div>
+            <div className="flex-1 min-h-[300px] p-6 bg-white">
+              <SpendingChart data={chartData} />
+            </div>
           </div>
         </div>
 
-        {/* Bottom Section: Transactions Table */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-semibold mb-6 text-gray-800">Recent Transactions</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50/50">
+        {/* Middle Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 reveal-4">
+          
+          <div className="playful-card h-[500px] overflow-hidden flex flex-col">
+            <div className="p-6 border-b-2 border-[#003049] bg-[#c1121f] text-white">
+              <h3 className="text-xl font-serif tracking-wide uppercase">Ask SmartSpend AI</h3>
+            </div>
+            <div className="flex-1 overflow-hidden bg-white">
+              <ChatBot />
+            </div>
+          </div>
+
+          <div className="playful-card flex flex-col overflow-hidden bg-white">
+            <div className="p-6 border-b-2 border-[#003049] bg-[#003049] text-white flex items-center gap-3">
+              <CreditCard size={20} className="text-[#669bbc]" />
+              <h3 className="text-xl font-serif tracking-wide uppercase">Active Subscriptions</h3>
+            </div>
+            
+            <div className="relative flex-1">
+              {subsLoading && (
+                <div className="absolute inset-0 bg-[#fdf0d5]/80 flex items-center justify-center z-10 backdrop-blur-sm">
+                  <Loader2 size={32} className="animate-spin text-[#c1121f]" />
+                </div>
+              )}
+              {subscriptions.length > 0 && (
+                <div className="w-full">
+                  {/* Column Headers */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-4 px-5 py-2 bg-[#fdf0d5] border-b border-[#003049]/20 text-[10px] font-bold uppercase tracking-widest text-[#669bbc] font-mono">
+                    <span>Service</span>
+                    <span className="text-center">Billing</span>
+                    <span className="text-right">Amount</span>
+                  </div>
+                  {subscriptions.map((sub, i) => (
+                    <div key={i} className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-5 py-4 border-b border-[#003049]/10 hover:bg-[#fdf0d5] transition-colors group">
+                      <div className="font-bold text-[#003049] text-base font-serif truncate">{sub.name}</div>
+                      <div className="text-[10px] font-bold text-[#c1121f] uppercase tracking-wider font-mono border border-[#c1121f]/30 px-2 py-0.5 rounded-sm whitespace-nowrap">{sub.frequency}</div>
+                      <div className="font-bold text-base text-[#003049] font-mono text-right group-hover:text-[#c1121f] transition-colors">₹{sub.amount.toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {subscriptions.length === 0 && !subsLoading && (
+                <div className="flex flex-col h-full items-center justify-center text-[#669bbc] gap-3 p-8">
+                  <FileText size={40} className="opacity-50" />
+                  <p className="font-mono text-sm uppercase tracking-widest text-center">No Subscriptions<br/>Detected</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 bg-[#fdf0d5] border-t-2 border-[#003049]">
+              <Pagination
+                currentPage={subsPagination.page}
+                totalPages={subsPagination.total_pages}
+                totalItems={subsPagination.total}
+                perPage={subsPagination.per_page}
+                onPageChange={handleSubsPageChange}
+              />
+            </div>
+
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div id="transactions-section" className="playful-card overflow-hidden bg-white reveal-4" style={{ animationDelay: '0.9s' }}>
+          <div className="p-6 border-b-2 border-[#003049] bg-[#003049] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <FileText size={20} className="text-[#fdf0d5]" />
+              <h3 className="text-xl font-serif tracking-wide uppercase">General Ledger</h3>
+            </div>
+            {txnPagination.total > 0 && (
+              <span className="px-3 py-1 bg-[#c1121f] border border-white text-white font-mono font-bold text-xs uppercase tracking-widest">
+                {txnPagination.total} records
+              </span>
+            )}
+          </div>
+          
+          <div className="overflow-x-auto relative">
+            {txnLoading && (
+              <div className="absolute inset-0 bg-[#fdf0d5]/80 flex items-center justify-center z-10 backdrop-blur-sm">
+                <Loader2 size={32} className="animate-spin text-[#c1121f]" />
+              </div>
+            )}
+            <table className="w-full text-left friendly-table font-mono text-sm">
+              <thead>
                 <tr>
-                  <th className="px-6 py-4 rounded-l-lg">Date</th>
-                  <th className="px-6 py-4">Description</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4 text-right">Amount</th>
-                  <th className="px-6 py-4 text-center rounded-r-lg">Status</th>
+                  <th>Date</th>
+                  <th>Merchant</th>
+                  <th>Classification</th>
+                  <th className="text-right">Amount</th>
+                  <th className="text-center">Flags</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {transactions.map((txn) => (
-                  <tr key={txn.id} className="bg-white hover:bg-gray-50/50 transition duration-150">
-                    <td className="px-6 py-4">{txn.date}</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{txn.description}</td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                  <tr key={txn.id} className="transition-colors group">
+                    <td className="text-[#669bbc]">{txn.date}</td>
+                    <td className="font-bold text-[#003049] font-serif text-lg">{txn.description}</td>
+                    <td>
+                      <span className="inline-flex items-center px-2 py-0.5 border border-[#003049] text-[10px] font-bold bg-[#fdf0d5] text-[#003049] uppercase tracking-widest">
                         {txn.category}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right font-medium">${txn.amount.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="text-right font-bold text-[#003049] text-base group-hover:text-[#c1121f] transition-colors">
+                      ₹{txn.amount.toFixed(2)}
+                    </td>
+                    <td className="text-center">
                       {txn.is_anomaly && (
-                        <div className="flex justify-center group relative">
-                          <AlertCircle size={18} className="text-red-500 cursor-help" />
-                          <span className="absolute bottom-full mb-2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                            High Value Transaction
-                          </span>
+                        <div className="flex justify-center">
+                          <div className="bg-[#c1121f] p-1 text-white animate-pulse">
+                            <ShieldAlert size={16} />
+                          </div>
                         </div>
                       )}
                     </td>
                   </tr>
                 ))}
-                {transactions.length === 0 && (
+                {transactions.length === 0 && !txnLoading && (
                   <tr>
-                    <td colSpan={5} className="text-center py-12">
-                      <div className="flex flex-col items-center text-gray-400">
-                        <FileText size={48} className="mb-3 opacity-50" />
-                        <p className="text-base">No transactions found.</p>
-                        <p className="text-sm">Upload a statement or generate demo data to begin.</p>
+                    <td colSpan={5} className="text-center py-20">
+                      <div className="flex flex-col items-center text-[#669bbc]">
+                        <FileText size={48} className="mb-4 opacity-40" />
+                        <p className="text-lg font-bold font-serif text-[#003049]">Ledger Empty</p>
+                        <p className="mt-1 text-xs uppercase tracking-widest">Awaiting PDF Ingestion</p>
                       </div>
                     </td>
                   </tr>
@@ -227,8 +433,19 @@ export default function Dashboard() {
               </tbody>
             </table>
           </div>
+          
+          <div className="p-4 bg-[#fdf0d5] border-t-2 border-[#003049]">
+            <Pagination
+              currentPage={txnPagination.page}
+              totalPages={txnPagination.total_pages}
+              totalItems={txnPagination.total}
+              perPage={txnPagination.per_page}
+              onPageChange={handleTxnPageChange}
+            />
+          </div>
         </div>
-      </div>
+      </main>
+      )}
     </div>
   );
 }

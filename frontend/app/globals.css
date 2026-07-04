@@ -1,26 +1,120 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-mono);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --bg-color: #fdf0d5; /* Warm Cream background */
+  --text-primary: #003049; /* Deep Navy text */
+  --text-secondary: #669bbc; /* Soft Steel Blue text */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-mono), monospace; /* Default to mono for that tech/editorial brutalist feel */
+  -webkit-font-smoothing: antialiased;
+  
+  /* Architectural Blueprint Grid Pattern */
+  background-image: 
+    linear-gradient(rgba(0, 48, 73, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 48, 73, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-attachment: fixed;
+  transition: background-color 0.3s ease;
+}
+
+html.terminal-mode-body,
+body.terminal-mode-body {
+  background-color: #003049 !important;
+  background-image: none !important;
+}
+
+h1, h2, h3, h4, h5, h6, .font-serif {
+  font-family: var(--font-serif), serif;
+}
+
+/* Custom sharp scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1121f;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #780000;
+}
+
+/* Brutalist / Editorial Card */
+.playful-card {
+  background: #fdf0d5;
+  border-radius: 0; 
+  border: 2px solid #003049; 
+  box-shadow: 6px 6px 0px 0px #003049; /* Sharp offset shadow */
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.playful-card:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0px 0px #003049; 
+}
+
+/* Staggered Reveal Animations */
+.reveal-1, .reveal-2, .reveal-3, .reveal-4 {
+  opacity: 0;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reveal-1 { animation-delay: 0.1s; }
+.reveal-2 { animation-delay: 0.3s; }
+.reveal-3 { animation-delay: 0.5s; }
+.reveal-4 { animation-delay: 0.7s; }
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Brutalist Table Styling */
+.friendly-table {
+  border-collapse: collapse;
+}
+
+.friendly-table th {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #003049;
+  border-bottom: 2px solid #003049;
+  padding: 12px;
+  letter-spacing: 0.1em;
+}
+
+.friendly-table td {
+  border-bottom: 1px solid rgba(0, 48, 73, 0.2);
+  color: #003049;
+  padding: 16px 12px;
+}
+
+.friendly-table tr:hover td {
+  background: rgba(0, 48, 73, 0.05); 
+}
+
+/* Recharts Overrides for clean tooltips */
+.recharts-tooltip-wrapper {
+  outline: none !important;
 }

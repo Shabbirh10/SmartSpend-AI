@@ -1,6 +1,7 @@
 import pdfplumber
 import re
 from datetime import datetime
+from app.services.pii_scrubber import pii_scrubber
 
 class PDFParser:
     def extract_transactions(self, pdf_path):
@@ -11,12 +12,14 @@ class PDFParser:
         transactions = []
         with pdfplumber.open(pdf_path) as pdf:
             for page in pdf.pages:
-                text = page.extract_text()
-                if not text:
+                raw_text = page.extract_text()
+                if not raw_text:
                     continue
                 
+                # Scrub PII from text before parsing
+                text = pii_scrubber.scrub(raw_text)
+                
                 # Basic line-by-line parsing (Example for generic statement)
-                # This needs to be improved with Regex or LLMs for specific banks
                 lines = text.split('\n')
                 for line in lines:
                     # Look for date pattern (DD/MM/YYYY)
@@ -30,7 +33,6 @@ class PDFParser:
                             amount_str = amount_match.group(0).replace(',', '')
                             
                             # Description is usually between date and amount
-                            # This is a naive heuristic; LLM works better here
                             desc_start = date_match.end()
                             desc_end = amount_match.start()
                             description = line[desc_start:desc_end].strip()
