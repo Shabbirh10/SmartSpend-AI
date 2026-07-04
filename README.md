@@ -6,8 +6,6 @@ SmartSpend AI is a full-stack intelligent financial assistant that turns your me
 
 <br/>
 
-![Upload Interface](assets/screenshot_upload.jpg)
-
 <br/>
 
 ## 📸 Screenshots
@@ -15,8 +13,6 @@ SmartSpend AI is a full-stack intelligent financial assistant that turns your me
 ### Dashboard
 ![Dashboard](assets/screenshot_dashboard.jpg)
 
-### AI Financial Chat
-![Chat](assets/screenshot_chat.jpg)
 
 <br/>
 
