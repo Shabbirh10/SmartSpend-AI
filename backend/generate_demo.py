@@ -90,7 +90,7 @@ def generate_realistic_bank_statement(filename):
             balance -= amt
             data.append([
                 current_date.strftime("%d/%m/%Y"),
-                f"UPI * {merchant} * UPI{random.randint(100000, 999999)}",
+                f"{merchant}",
                 f"REF{random.randint(10000, 99999)}",
                 f"{amt:.2f}",
                 "",
