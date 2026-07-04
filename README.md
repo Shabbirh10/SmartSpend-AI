@@ -14,6 +14,9 @@ SmartSpend AI is a full-stack intelligent financial assistant that turns your me
 ![Dashboard](assets/screenshot_dashboard.jpg)
 
 
+### Terminal Mode
+![Terminal](assets/screenshot_terminal.jpg)
+
 <br/>
 
 ## ✨ Features
