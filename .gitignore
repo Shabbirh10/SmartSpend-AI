@@ -33,3 +33,6 @@ frontend/tsconfig.tsbuildinfo
 # Pytest
 .pytest_cache/
 **/.pytest_cache/
+
+# PNG screenshots (JPG is the canonical format for README)
+assets/*.png
