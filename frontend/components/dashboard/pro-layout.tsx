@@ -59,8 +59,6 @@ export function ProLayout({ trendData }: { trendData: any[] }) {
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }}
         rowHeight={80}
-        isDraggable={true}
-        isResizable={true}
       >
         <div key="cashflow" className="border border-[#669bbc] bg-[#001f30] p-4 overflow-hidden flex flex-col">
           <div className="text-white text-xs uppercase tracking-widest font-bold mb-2 flex items-center gap-2 border-b border-[#669bbc]/30 pb-2">
