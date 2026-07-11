@@ -83,7 +83,18 @@ export default function Dashboard() {
         fetchTransactions(1),
         fetchSubscriptions(1),
         getTrends().then(trends => setTrendData(trends.data)).catch(console.error),
-        getIndianFinancialNews().then(news => setNewsData(news.data || [])).catch(console.error),
+        getIndianFinancialNews()
+          .then(news => {
+            if (news.data && news.data.length > 0) {
+              setNewsData(news.data);
+            } else {
+              setNewsData([{ title: "No news available at the moment.", link: "#", pubDate: "" }]);
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            setNewsData([{ title: "Failed to fetch live news feed. Please try again later.", link: "#", pubDate: "" }]);
+          }),
         getCategories().then(cat => setChartData(cat.data || [])).catch(console.error),
       ]);
     };

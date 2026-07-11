@@ -38,7 +38,7 @@ export const getSubscriptions = async (page = 1, perPage = 6) => {
 };
 
 export const downloadDemoStatement = () => {
-  window.open(`${API_URL}/demo/download`, '_blank');
+  window.open('/demo_statement.pdf', '_blank');
 };
 
 export const getPortfolio = async () => {
