@@ -390,8 +390,8 @@ async def get_indian_financial_news():
     import xml.etree.ElementTree as ET
     
     try:
-        url = "https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2146842.cms"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        url = "https://www.livemint.com/rss/markets"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
         with urllib.request.urlopen(req) as response:
             xml_data = response.read()
         
